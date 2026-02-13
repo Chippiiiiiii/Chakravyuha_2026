@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<h2>Admin Auction Control</h2>
+
+<input type="number" id="basePrice" placeholder="Base Price">
+<button onclick="startAuction()">Start Auction</button>
+
+<h3>Live Bids</h3>
+<div id="bids"></div>
+
+<h2 id="adminResult"></h2>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    function startAuction() {
+      const basePrice = parseInt(document.getElementById("basePrice").value);
+      socket.emit("startAuction", { basePrice, duration: 60 });
+    }
+
+    socket.on("adminUpdate", (bids) => {
+      const container = document.getElementById("bids");
+      container.innerHTML = "";
+
+      for (let team in bids) {
+        container.innerHTML +=
+          `<p>${team}: ₹${bids[team].amount}</p>`;
+      }
+    });
+
+    socket.on("auctionStarted", () => {
+      document.getElementById("adminResult").innerText = "";
+    });
+
+    socket.on("auctionEnded", ({ winner, highest }) => {
+      document.getElementById("adminResult").innerText =
+        "Auction Closed! Highest Bid: ₹" + highest + " | Winner: " + winner;
+    });
+
+</script>
+
+</body>
+</html>
