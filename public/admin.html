@@ -9,11 +9,18 @@
     <h1>Admin Dashboard</h1>
 
     <div class="card">
-        <h2 id="highest"></h2>
-        <button onclick="endAuction()">End Auction</button>
+        <h2 id="timer"></h2>
+
+        <input type="number" id="basePrice" placeholder="Base Price">
+        <input type="number" id="capital" placeholder="Initial Capital">
+        <input type="number" id="roundTime" placeholder="Round Time (sec)">
+
+        <button onclick="saveSettings()">Save Settings</button>
+        <button onclick="startRound()">Start Round</button>
+        <button onclick="endRound()">End Round</button>
     </div>
 
-    <div id="teams"></div>
+    <div id="teamsAdmin"></div>
 </div>
 
 <script src="script.js"></script>

@@ -21,27 +21,43 @@ async function bid() {
     });
 
     const data = await res.json();
+    if (data.error) alert(data.error);
+}
 
-    if (data.error) {
-        alert(data.error);
-    } else {
-        alert("Bid placed!");
-    }
+async function saveSettings() {
+    const basePrice = parseInt(document.getElementById("basePrice").value);
+    const capital = parseInt(document.getElementById("capital").value);
+    const roundTime = parseInt(document.getElementById("roundTime").value);
+
+    await fetch("/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ basePrice, capital, roundTime })
+    });
+
+    alert("Settings Saved");
+}
+
+async function startRound() {
+    await fetch("/start", { method: "POST" });
+}
+
+async function endRound() {
+    await fetch("/end", { method: "POST" });
 }
 
 async function loadData() {
     const res = await fetch("/data");
     const data = await res.json();
 
-    if (document.getElementById("highest")) {
-        document.getElementById("highest").innerText =
-            "Highest Bid: ₹" + data.highestBid + " (" + data.highestTeam + ")";
+    // ADMIN PAGE
+    if (document.getElementById("teamsAdmin")) {
+        document.getElementById("timer").innerText =
+            "Time Left: " + data.timeLeft + "s";
 
-        const teamsDiv = document.getElementById("teams");
-        teamsDiv.innerHTML = "";
-
+        let html = "";
         for (let team in data.teams) {
-            teamsDiv.innerHTML += `
+            html += `
                 <div class="team-box">
                     <h3>${team}</h3>
                     <p>Capital: ₹${data.teams[team].capital}</p>
@@ -49,23 +65,37 @@ async function loadData() {
                 </div>
             `;
         }
+
+        document.getElementById("teamsAdmin").innerHTML =
+            `<div class="row-container">${html}</div>`;
     }
 
-    if (document.getElementById("teamInfo")) {
-        const teamName = document.getElementById("teamName").value;
-        if (data.teams[teamName]) {
-            document.getElementById("teamInfo").innerHTML = `
-                <h3>${teamName}</h3>
-                <p>Remaining Capital: ₹${data.teams[teamName].capital}</p>
-                <p>Highest Bid: ₹${data.highestBid}</p>
+    // TEAM PAGE
+    if (document.getElementById("teamsRow")) {
+
+        let html = "";
+        for (let team in data.teams) {
+            html += `
+                <div class="team-box">
+                    <h3>${team}</h3>
+                    <p>Capital: ₹${data.teams[team].capital}</p>
+                    <p>Your Current Bid: ₹${data.teams[team].bid}</p>
+                </div>
             `;
         }
-    }
-}
 
-async function endAuction() {
-    await fetch("/end", { method: "POST" });
-    alert("Auction ended!");
+        document.getElementById("teamsRow").innerHTML =
+            `<div class="row-container">${html}</div>`;
+
+        if (data.roundEnded) {
+            document.getElementById("resultBox").innerHTML = `
+                <h2>Winner: ${data.lastWinner || "No Winner"}</h2>
+                <h3>Winning Bid: ₹${data.lastWinningBid}</h3>
+            `;
+        } else {
+            document.getElementById("resultBox").innerHTML = "";
+        }
+    }
 }
 
 setInterval(loadData, 1000);
