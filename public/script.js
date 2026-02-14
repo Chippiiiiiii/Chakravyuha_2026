@@ -155,7 +155,7 @@ socket.on("update", (data) => {
         leaderboardContainer.innerHTML = `
         <table>
             <thead>
-                <tr><th>Team No</th><th>Team Name</th><th>Rounds Won</th></tr>
+                <tr><th>Team No</th><th>Team Name</th><th>Assets Owned</th></tr>
             </thead>
             <tbody>
                 ${data.leaderboard.map(l => `
