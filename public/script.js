@@ -1,6 +1,8 @@
 let savedTeam = localStorage.getItem("teamName") || null;
 const socket = io(); // connect to server
 
+// --- TEAM FUNCTIONS ---
+
 window.register = async function () {
     const name = document.getElementById("teamName").value.trim();
     if (!name) return alert("Enter team name");
@@ -35,13 +37,16 @@ window.bid = async function () {
     if (data.error) alert(data.error);
 };
 
+// --- ADMIN FUNCTIONS ---
+
 window.saveSettings = async function () {
     await fetch("/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             capital: parseInt(document.getElementById("capital").value) || 0,
-            roundTime: parseInt(document.getElementById("roundTime").value) || 0
+            roundTime: parseInt(document.getElementById("roundTime").value) || 0,
+            basePrice: parseInt(document.getElementById("basePrice").value) || 0
         })
     });
 };
@@ -53,6 +58,8 @@ window.startRound = async function () {
 window.endRound = async function () {
     await fetch("/end", { method: "POST" });
 };
+
+// --- LAYOUT CONTROL ---
 
 function updateLayout() {
     const registerCard = document.getElementById("registerCard");
@@ -66,19 +73,26 @@ function updateLayout() {
     }
 }
 
-// Listen for updates from server
+// --- SOCKET.IO LISTENER ---
+
 socket.on("update", (data) => {
+    // Timers
     const timer = document.getElementById("timer");
     if (timer) timer.innerText = "Time Left: " + data.timeLeft + "s";
 
     const teamTimer = document.getElementById("teamTimer");
     if (teamTimer) teamTimer.innerText = "Time Left: " + data.timeLeft + "s";
 
+    // Base Price Display
+    const basePriceDisplay = document.getElementById("basePriceDisplay");
+    if (basePriceDisplay) basePriceDisplay.innerText = "Base Price: ₹" + data.basePrice;
+
+    // Highest Bidder
     const highest = document.getElementById("highestTeam");
     if (highest)
         highest.innerText = "Highest Bidder: " + (data.highestTeam || "None");
 
-    // Registered Teams
+    // Registered Teams (Admin)
     const teamListTable = document.getElementById("teamListTable");
     if (teamListTable) {
         const tbody = teamListTable.querySelector("tbody");
@@ -133,3 +147,6 @@ socket.on("update", (data) => {
 
     updateLayout();
 });
+
+// Initialize layout
+updateLayout();
