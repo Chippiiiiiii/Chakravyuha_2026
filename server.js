@@ -27,7 +27,6 @@ app.post("/register", (req, res) => {
     if (!teamName || teams[teamName]) {
         return res.json({ success: false, error: "Invalid or duplicate team" });
     }
-    // Assign initial capital set by admin
     teams[teamName] = { capital: initialCapital, bid: 0 };
     io.emit("update", getData());
     res.json({ success: true });
@@ -60,13 +59,12 @@ app.post("/settings", (req, res) => {
 app.post("/start", (req, res) => {
     timerRunning = true;
     currentRoundBids = {};
-    // Reset bids at start
     for (let t in teams) teams[t].bid = 0;
     io.emit("update", getData());
     res.json({ success: true });
 });
 
-// End round (manual)
+// End round
 app.post("/end", (req, res) => {
     endRoundLogic();
     res.json({ success: true });
@@ -75,6 +73,14 @@ app.post("/end", (req, res) => {
 // Round end logic
 function endRoundLogic() {
     timerRunning = false;
+
+    // Save all bids for this round
+    const roundBids = Object.entries(currentRoundBids).map(([team, bid], index) => ({
+        teamNo: index + 1,
+        team,
+        bid
+    }));
+
     let winner = Object.entries(currentRoundBids).sort((a,b)=>b[1]-a[1])[0];
 
     if (winner) {
@@ -83,7 +89,9 @@ function endRoundLogic() {
             teams[winnerName].capital -= winningBid;
             if (teams[winnerName].capital < 0) teams[winnerName].capital = 0;
         }
-        history.push({ team: winnerName, bid: winningBid });
+        history.push({ round: roundNumber, team: winnerName, bid: winningBid, allBids: roundBids });
+    } else {
+        history.push({ round: roundNumber, team: null, bid: 0, allBids: roundBids });
     }
 
     // Reset all bids
@@ -108,10 +116,6 @@ function getData() {
         highestTeam: Object.keys(currentRoundBids).length
             ? Object.entries(currentRoundBids).sort((a,b)=>b[1]-a[1])[0][0]
             : null,
-        roundDetails: history.map((h,i)=>({
-            round: i+1,
-            bids:[{teamNo:i+1, team:h.team, bid:h.bid}]
-        })),
         basePrice
     };
 }
