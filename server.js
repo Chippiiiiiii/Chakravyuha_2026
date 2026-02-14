@@ -22,6 +22,7 @@ let auction = {
     dashboardActive: false
 };
 
+// ROUTES
 app.get("/", (req, res) => {
     res.sendFile(__dirname + "/public/index.html");
 });
@@ -63,7 +64,7 @@ app.post("/settings", (req, res) => {
 app.post("/start", (req, res) => {
 
     if (auction.timerRunning)
-        return res.json({ error: "Already running" });
+        return res.json({ error: "Round already running" });
 
     auction.roundNumber++;
     auction.highestBid = 0;
@@ -110,8 +111,6 @@ app.post("/bid", (req, res) => {
     auction.highestBid = amount;
     auction.highestTeam = teamName;
     auction.teams[teamName].bid = amount;
-
-    // Live tracking
     auction.currentRoundBids[teamName] = amount;
 
     res.json({ success: true });
