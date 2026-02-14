@@ -17,16 +17,19 @@
 
     <div class="center-section">
 
+        <!-- Registration Card -->
         <div class="card" id="registerCard">
             <input type="text" id="teamName" placeholder="Enter Team Name">
             <button onclick="register()">Register</button>
         </div>
 
+        <!-- Bidding Card -->
         <div class="card" id="bidCard" style="display:none;">
             <input type="number" id="bidAmount" placeholder="Enter Bid">
             <button onclick="bid()">Place Bid</button>
         </div>
 
+        <!-- Team Info -->
         <div id="teamInfo"></div>
 
     </div>
@@ -35,15 +38,20 @@
         <h2>Round Winners</h2>
         <table id="winnerTable">
             <thead>
-            <tr><th>S.No</th><th>Winner Team</th></tr>
+                <tr>
+                    <th>S.No</th>
+                    <th>Winner Team</th>
+                </tr>
             </thead>
             <tbody></tbody>
         </table>
     </div>
 
 </div>
+
+<!-- Load Socket.IO client first -->
 <script src="/socket.io/socket.io.js"></script>
+<!-- Then load your custom script -->
 <script src="script.js"></script>
 </body>
 </html>
-
