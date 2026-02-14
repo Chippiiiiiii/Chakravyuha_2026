@@ -74,7 +74,6 @@ app.post("/end", (req, res) => {
 function endRoundLogic() {
     timerRunning = false;
 
-    // Save all bids for this round
     const roundBids = Object.entries(currentRoundBids).map(([team, bid], index) => ({
         teamNo: index + 1,
         team,
@@ -94,7 +93,6 @@ function endRoundLogic() {
         history.push({ round: roundNumber, team: null, bid: 0, allBids: roundBids });
     }
 
-    // Reset all bids
     for (let t in teams) {
         teams[t].bid = 0;
     }
@@ -102,6 +100,22 @@ function endRoundLogic() {
 
     roundNumber++;
     io.emit("update", getData());
+}
+
+// Helper: calculate leaderboard
+function calculateLeaderboard() {
+    let leaderboard = {};
+    history.forEach(h => {
+        if (h.team) {
+            leaderboard[h.team] = (leaderboard[h.team] || 0) + 1;
+        }
+    });
+
+    return Object.entries(leaderboard).map(([team, wins], index) => ({
+        teamNo: index + 1,
+        team,
+        wins
+    }));
 }
 
 // Helper: current state
@@ -116,7 +130,8 @@ function getData() {
         highestTeam: Object.keys(currentRoundBids).length
             ? Object.entries(currentRoundBids).sort((a,b)=>b[1]-a[1])[0][0]
             : null,
-        basePrice
+        basePrice,
+        leaderboard: calculateLeaderboard()
     };
 }
 
@@ -126,7 +141,7 @@ setInterval(() => {
         timeLeft--;
         io.emit("update", getData());
         if (timeLeft === 0) {
-            endRoundLogic(); // auto end round when timer hits zero
+            endRoundLogic();
         }
     }
 }, 1000);
