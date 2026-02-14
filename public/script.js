@@ -1,6 +1,4 @@
-// ================= TEAM SESSION =================
-
-// Only restore team from THIS browser storage
+// ================= SESSION =================
 let savedTeam = localStorage.getItem("teamName") || null;
 
 
@@ -32,7 +30,7 @@ window.register = async function () {
 };
 
 
-// ================= PLACE BID =================
+// ================= BID =================
 window.bid = async function () {
 
     if (!savedTeam) {
@@ -50,6 +48,35 @@ window.bid = async function () {
 
     const data = await res.json();
     if (data.error) alert(data.error);
+};
+
+
+// ================= ADMIN FUNCTIONS =================
+window.saveSettings = async function () {
+
+    const base = document.getElementById("basePrice");
+    const cap = document.getElementById("capital");
+    const time = document.getElementById("roundTime");
+
+    await fetch("/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            basePrice: parseInt(base?.value) || 0,
+            capital: parseInt(cap?.value) || 0,
+            roundTime: parseInt(time?.value) || 0
+        })
+    });
+
+    alert("Settings Saved");
+};
+
+window.startRound = async function () {
+    await fetch("/start", { method: "POST" });
+};
+
+window.endRound = async function () {
+    await fetch("/end", { method: "POST" });
 };
 
 
@@ -78,30 +105,74 @@ async function loadData() {
     const res = await fetch("/data");
     const data = await res.json();
 
-    // If this browser has savedTeam but server does not → clear it
+    // Clear invalid session
     if (savedTeam && !data.teams[savedTeam]) {
         localStorage.removeItem("teamName");
         savedTeam = null;
         updateLayout();
     }
 
+    // ===== ADMIN TIMER =====
+    const adminTimer = document.getElementById("timer");
+    if (adminTimer) {
+        adminTimer.innerText = "Time Left: " + data.timeLeft + "s";
+    }
+
     // ===== TEAM TIMER =====
     const teamTimer = document.getElementById("teamTimer");
     if (teamTimer) {
         teamTimer.innerText = "Time Left: " + data.timeLeft + "s";
+    }
 
-        if (data.timeLeft <= 10) {
-            teamTimer.style.color = "red";
-        } else {
-            teamTimer.style.color = "#00e676";
+    // ===== HIGHEST BIDDER =====
+    const highest = document.getElementById("highestTeam");
+    if (highest) {
+        highest.innerText =
+            "Highest Bidder: " + (data.highestTeam || "None");
+    }
+
+    // ===== REGISTERED TEAMS TABLE =====
+    const teamListTable = document.getElementById("teamListTable");
+    if (teamListTable) {
+
+        const tbody = teamListTable.querySelector("tbody");
+        tbody.innerHTML = "";
+
+        let teamNo = 1;
+
+        for (let team in data.teams) {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${teamNo}</td>
+                    <td>${team}</td>
+                </tr>
+            `;
+            teamNo++;
         }
     }
 
-    // ===== TEAM PAGE INFO =====
+    // ===== ROUND RESULTS =====
+    const adminHistoryTable = document.getElementById("adminHistoryTable");
+    if (adminHistoryTable) {
+
+        const tbody = adminHistoryTable.querySelector("tbody");
+        tbody.innerHTML = "";
+
+        data.history.forEach((item, index) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${item.team}</td>
+                    <td>₹${item.bid}</td>
+                </tr>
+            `;
+        });
+    }
+
+    // ===== TEAM INFO =====
     if (savedTeam && data.teams[savedTeam]) {
 
         const info = document.getElementById("teamInfo");
-
         if (info) {
             info.innerHTML = `
                 <div class="team-box">
@@ -112,7 +183,7 @@ async function loadData() {
         }
     }
 
-    // ===== ROUND WINNER TABLE =====
+    // ===== TEAM WINNER TABLE =====
     const winnerTable = document.getElementById("winnerTable");
     if (winnerTable) {
 
@@ -135,7 +206,5 @@ async function loadData() {
 
 // ================= AUTO REFRESH =================
 setInterval(loadData, 1000);
-
-// Initial load
 loadData();
 updateLayout();
