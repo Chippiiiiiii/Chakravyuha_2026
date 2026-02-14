@@ -64,13 +64,13 @@ app.post("/start", (req, res) => {
     res.json({ success: true });
 });
 
-// End round
+// End round (manual)
 app.post("/end", (req, res) => {
     endRoundLogic();
     res.json({ success: true });
 });
 
-// Helper: round end logic
+// Round end logic
 function endRoundLogic() {
     timerRunning = false;
     let winner = Object.entries(currentRoundBids).sort((a,b)=>b[1]-a[1])[0];
