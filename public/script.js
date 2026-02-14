@@ -60,6 +60,7 @@ window.goDashboard = async function () {
 };
 
 function updateLayout() {
+
     const registerCard = document.getElementById("registerCard");
     const bidCard = document.getElementById("bidCard");
     const teamLabel = document.getElementById("teamLabel");
@@ -87,18 +88,44 @@ async function loadData() {
         highest.innerText =
             "Highest Bidder: " + (data.highestTeam || "None");
 
+    // Registered Teams
+    const teamListTable = document.getElementById("teamListTable");
+    if (teamListTable) {
+        const tbody = teamListTable.querySelector("tbody");
+        tbody.innerHTML = "";
+        let no = 1;
+        for (let t in data.teams) {
+            tbody.innerHTML += `<tr><td>${no}</td><td>${t}</td></tr>`;
+            no++;
+        }
+    }
 
-    // ===== LIVE ROUND TABLE =====
-    const roundDetailsContainer =
+    // Round Results
+    const adminHistoryTable = document.getElementById("adminHistoryTable");
+    if (adminHistoryTable) {
+        const tbody = adminHistoryTable.querySelector("tbody");
+        tbody.innerHTML = "";
+        data.history.forEach((h, i) => {
+            tbody.innerHTML += `
+            <tr>
+                <td>${i + 1}</td>
+                <td>${h.team}</td>
+                <td>₹${h.bid}</td>
+            </tr>`;
+        });
+    }
+
+    // Round Details
+    const container =
         document.getElementById("roundDetailsContainer");
 
-    if (roundDetailsContainer) {
+    if (container) {
 
-        roundDetailsContainer.innerHTML = "";
+        container.innerHTML = "";
 
         if (data.timerRunning) {
 
-            let html = `
+            let liveHTML = `
             <div class="round-card">
                 <h3>Round ${data.roundNumber} (Live)</h3>
                 <table>
@@ -111,32 +138,27 @@ async function loadData() {
                 </thead>
                 <tbody>`;
 
-            let teamNo = 1;
+            let no = 1;
 
-            for (let team in data.teams) {
-
-                let bid =
-                    data.currentRoundBids[team] || 0;
-
-                html += `
+            for (let t in data.teams) {
+                let bid = data.currentRoundBids[t] || 0;
+                liveHTML += `
                 <tr>
-                    <td>${teamNo}</td>
-                    <td>${team}</td>
+                    <td>${no}</td>
+                    <td>${t}</td>
                     <td>₹${bid}</td>
                 </tr>`;
-
-                teamNo++;
+                no++;
             }
 
-            html += "</tbody></table></div>";
+            liveHTML += "</tbody></table></div>";
+            container.innerHTML += liveHTML;
+        }
 
-            roundDetailsContainer.innerHTML = html;
+        data.roundDetails.forEach(r => {
 
-        } else {
-
-            data.roundDetails.forEach(r => {
-
-                let html = `<div class="round-card">
+            let html = `
+            <div class="round-card">
                 <h3>Round ${r.round}</h3>
                 <table>
                 <thead>
@@ -148,20 +170,46 @@ async function loadData() {
                 </thead>
                 <tbody>`;
 
-                r.bids.forEach(b => {
-                    html += `
-                    <tr>
-                        <td>${b.teamNo}</td>
-                        <td>${b.team}</td>
-                        <td>₹${b.bid}</td>
-                    </tr>`;
-                });
-
-                html += "</tbody></table></div>";
-
-                roundDetailsContainer.innerHTML += html;
+            r.bids.forEach(b => {
+                html += `
+                <tr>
+                    <td>${b.teamNo}</td>
+                    <td>${b.team}</td>
+                    <td>₹${b.bid}</td>
+                </tr>`;
             });
+
+            html += "</tbody></table></div>";
+
+            container.innerHTML += html;
+        });
+    }
+
+    // Team Info
+    if (savedTeam && data.teams[savedTeam]) {
+
+        const info = document.getElementById("teamInfo");
+        if (info) {
+            info.innerHTML = `
+            <div class="team-box">
+                <p>Capital: ₹${data.teams[savedTeam].capital}</p>
+                <p>Your Current Bid: ₹${data.teams[savedTeam].bid}</p>
+            </div>`;
         }
+    }
+
+    // Team Winner Table
+    const winnerTable = document.getElementById("winnerTable");
+    if (winnerTable) {
+        const tbody = winnerTable.querySelector("tbody");
+        tbody.innerHTML = "";
+        data.history.forEach((item, index) => {
+            tbody.innerHTML += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${item.team}</td>
+            </tr>`;
+        });
     }
 
     updateLayout();

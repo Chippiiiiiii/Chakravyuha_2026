@@ -1,78 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Dashboard</title>
+    <title>Team Auction</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
 
-    <h1 class="main-title">Admin Dashboard</h1>
+    <h1 class="main-title">AUCTION</h1>
+    <h3 id="teamTimer" style="text-align:center;"></h3>
 
-    <!-- ================= CONTROL PANEL ================= -->
-    <div class="card admin-card">
+    <div class="team-name-wrapper">
+        <h3 id="teamLabel"></h3>
+    </div>
 
-        <h2 id="highestTeam">Highest Bidder: None</h2>
-        <h3 id="timer">Time Left: 0s</h3>
+    <div class="center-section">
 
-        <input type="number" id="basePrice" placeholder="Base Price">
-        <input type="number" id="capital" placeholder="Initial Capital">
-        <input type="number" id="roundTime" placeholder="Round Time (sec)">
+        <div class="card" id="registerCard">
+            <input type="text" id="teamName" placeholder="Enter Team Name">
+            <button onclick="register()">Register</button>
+        </div>
 
-        <button onclick="saveSettings()">Save Settings</button>
-        <button onclick="startRound()">Start Round</button>
-        <button onclick="endRound()">End Round</button>
+        <div class="card" id="bidCard" style="display:none;">
+            <input type="number" id="bidAmount" placeholder="Enter Bid">
+            <button onclick="bid()">Place Bid</button>
+        </div>
 
-        <!-- NEW DASHBOARD BUTTON -->
-        <button onclick="goDashboard()">Dashboard</button>
+        <div id="teamInfo"></div>
 
     </div>
 
-
-    <!-- ================= REGISTERED TEAMS ================= -->
     <div class="winner-section">
 
-        <h2>Registered Teams</h2>
+        <h2>Round Winners</h2>
 
-        <table id="teamListTable">
-            <thead>
-            <tr>
-                <th>Team No</th>
-                <th>Team Name</th>
-            </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-
-    </div>
-
-
-    <!-- ================= ROUND RESULTS ================= -->
-    <div class="winner-section">
-
-        <h2>Round Results</h2>
-
-        <table id="adminHistoryTable">
+        <table id="winnerTable">
             <thead>
             <tr>
                 <th>S.No</th>
-                <th>Round Winner</th>
-                <th>Winning Bid</th>
+                <th>Winner Team</th>
             </tr>
             </thead>
             <tbody></tbody>
         </table>
-
-    </div>
-
-
-    <!-- ================= ROUND DETAILS (LIVE + LOCKED) ================= -->
-    <div class="winner-section">
-
-        <h2>Round Details</h2>
-
-        <div id="roundDetailsContainer"></div>
 
     </div>
 
