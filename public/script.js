@@ -79,6 +79,20 @@ async function loadData() {
 
             teamNo++;
         }
+
+        // HISTORY
+        const historyBody = document.querySelector("#historyTable tbody");
+        historyBody.innerHTML = "";
+
+        data.history.forEach((item, index) => {
+            historyBody.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${item.team}</td>
+                    <td>₹${item.bid}</td>
+                </tr>
+            `;
+        });
     }
 
     // TEAM PAGE
