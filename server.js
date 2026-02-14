@@ -1,6 +1,7 @@
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
+const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
@@ -16,14 +17,18 @@ let roundNumber = 1;
 let timerRunning = false;
 let timeLeft = 60;
 
+// Admin settings
+let initialCapital = 0;
+let basePrice = 0;
+
 // Register team
 app.post("/register", (req, res) => {
     const { teamName } = req.body;
     if (!teamName || teams[teamName]) {
         return res.json({ success: false, error: "Invalid or duplicate team" });
     }
-    teams[teamName] = { capital: 100, bid: 0 };
-    io.emit("update", getData()); // notify clients
+    teams[teamName] = { capital: initialCapital, bid: 0 };
+    io.emit("update", getData());
     res.json({ success: true });
 });
 
@@ -31,6 +36,7 @@ app.post("/register", (req, res) => {
 app.post("/bid", (req, res) => {
     const { teamName, amount } = req.body;
     if (!teams[teamName]) return res.json({ error: "Team not registered" });
+    if (amount < basePrice) return res.json({ error: `Bid must be at least ₹${basePrice}` });
     if (amount > teams[teamName].capital) return res.json({ error: "Not enough capital" });
 
     teams[teamName].bid = amount;
@@ -39,13 +45,12 @@ app.post("/bid", (req, res) => {
     res.json({ success: true });
 });
 
-// Settings
+// Save settings
 app.post("/settings", (req, res) => {
-    const { capital, roundTime } = req.body;
-    for (let t in teams) {
-        teams[t].capital = capital;
-    }
+    const { capital, roundTime, basePrice: bp } = req.body;
+    initialCapital = capital;
     timeLeft = roundTime;
+    basePrice = bp;
     io.emit("update", getData());
     res.json({ success: true });
 });
@@ -85,7 +90,8 @@ function getData() {
         roundDetails: history.map((h,i)=>({
             round: i+1,
             bids:[{teamNo:i+1, team:h.team, bid:h.bid}]
-        }))
+        })),
+        basePrice
     };
 }
 
@@ -96,6 +102,10 @@ setInterval(() => {
         io.emit("update", getData());
     }
 }, 1000);
+
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
