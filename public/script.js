@@ -1,7 +1,8 @@
 // ================= TEAM SESSION =================
 
-// Restore saved team from browser
-let savedTeam = localStorage.getItem("teamName");
+// Only restore team from THIS browser storage
+let savedTeam = localStorage.getItem("teamName") || null;
+
 
 // ================= REGISTER =================
 window.register = async function () {
@@ -30,6 +31,7 @@ window.register = async function () {
     }
 };
 
+
 // ================= PLACE BID =================
 window.bid = async function () {
 
@@ -50,29 +52,6 @@ window.bid = async function () {
     if (data.error) alert(data.error);
 };
 
-// ================= ADMIN FUNCTIONS =================
-window.saveSettings = async function () {
-
-    await fetch("/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            basePrice: parseInt(basePrice.value) || 0,
-            capital: parseInt(capital.value) || 0,
-            roundTime: parseInt(roundTime.value) || 0
-        })
-    });
-
-    alert("Settings Saved");
-};
-
-window.startRound = async function () {
-    await fetch("/start", { method: "POST" });
-};
-
-window.endRound = async function () {
-    await fetch("/end", { method: "POST" });
-};
 
 // ================= UPDATE LAYOUT =================
 function updateLayout() {
@@ -92,23 +71,18 @@ function updateLayout() {
     }
 }
 
+
 // ================= LOAD DATA =================
 async function loadData() {
 
     const res = await fetch("/data");
     const data = await res.json();
 
-    // If saved team removed from server → clear session
+    // If this browser has savedTeam but server does not → clear it
     if (savedTeam && !data.teams[savedTeam]) {
         localStorage.removeItem("teamName");
         savedTeam = null;
         updateLayout();
-    }
-
-    // ===== ADMIN TIMER =====
-    const adminTimer = document.getElementById("timer");
-    if (adminTimer) {
-        adminTimer.innerText = "Time Left: " + data.timeLeft + "s";
     }
 
     // ===== TEAM TIMER =====
@@ -123,98 +97,11 @@ async function loadData() {
         }
     }
 
-    // ===== HIGHEST BIDDER (ADMIN) =====
-    const highest = document.getElementById("highestTeam");
-    if (highest) {
-        highest.innerText =
-            "Highest Bidder: " + (data.highestTeam || "None");
-    }
-
-    // ===== REGISTERED TEAMS TABLE =====
-    const teamListTable = document.getElementById("teamListTable");
-    if (teamListTable) {
-
-        const tbody = teamListTable.querySelector("tbody");
-        tbody.innerHTML = "";
-
-        let teamNo = 1;
-
-        for (let team in data.teams) {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${teamNo}</td>
-                    <td>${team}</td>
-                </tr>
-            `;
-            teamNo++;
-        }
-    }
-
-    // ===== ROUND RESULTS SUMMARY =====
-    const adminHistoryTable = document.getElementById("adminHistoryTable");
-    if (adminHistoryTable) {
-
-        const tbody = adminHistoryTable.querySelector("tbody");
-        tbody.innerHTML = "";
-
-        data.history.forEach((item, index) => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${item.team}</td>
-                    <td>₹${item.bid}</td>
-                </tr>
-            `;
-        });
-    }
-
-    // ===== LOCKED TABLE PER ROUND =====
-    const roundDetailsContainer = document.getElementById("roundDetailsContainer");
-
-    if (roundDetailsContainer) {
-
-        roundDetailsContainer.innerHTML = "";
-
-        data.roundDetails.forEach((round) => {
-
-            let tableHTML = `
-                <div class="round-card">
-                    <h3>Round ${round.round}</h3>
-                    <table class="roundTable">
-                        <thead>
-                            <tr>
-                                <th>Team No</th>
-                                <th>Team Name</th>
-                                <th>Bid</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            round.bids.forEach((bid) => {
-                tableHTML += `
-                    <tr>
-                        <td>${bid.teamNo}</td>
-                        <td>${bid.team}</td>
-                        <td>₹${bid.bid}</td>
-                    </tr>
-                `;
-            });
-
-            tableHTML += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-
-            roundDetailsContainer.innerHTML += tableHTML;
-        });
-    }
-
     // ===== TEAM PAGE INFO =====
     if (savedTeam && data.teams[savedTeam]) {
 
         const info = document.getElementById("teamInfo");
+
         if (info) {
             info.innerHTML = `
                 <div class="team-box">
@@ -225,7 +112,7 @@ async function loadData() {
         }
     }
 
-    // ===== TEAM PAGE WINNER TABLE =====
+    // ===== ROUND WINNER TABLE =====
     const winnerTable = document.getElementById("winnerTable");
     if (winnerTable) {
 
@@ -245,9 +132,10 @@ async function loadData() {
     updateLayout();
 }
 
-// AUTO REFRESH EVERY SECOND
+
+// ================= AUTO REFRESH =================
 setInterval(loadData, 1000);
 
-// INITIAL LOAD
+// Initial load
 loadData();
 updateLayout();
