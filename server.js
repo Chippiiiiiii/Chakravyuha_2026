@@ -67,13 +67,24 @@ app.post("/start", (req, res) => {
 app.post("/end", (req, res) => {
     timerRunning = false;
     let winner = Object.entries(currentRoundBids).sort((a,b)=>b[1]-a[1])[0];
+
     if (winner) {
-        history.push({ team: winner[0], bid: winner[1] });
+        const [winnerName, winningBid] = winner;
+
+        // Deduct winning bid from winner's capital
+        if (teams[winnerName]) {
+            teams[winnerName].capital -= winningBid;
+            if (teams[winnerName].capital < 0) teams[winnerName].capital = 0; // safety
+        }
+
+        history.push({ team: winnerName, bid: winningBid });
     }
+
     roundNumber++;
     io.emit("update", getData());
     res.json({ success: true });
 });
+
 
 // Helper: current state
 function getData() {
@@ -109,3 +120,4 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
