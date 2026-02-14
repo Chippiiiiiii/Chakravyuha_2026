@@ -8,35 +8,29 @@ window.register = async function () {
     const input = document.getElementById("teamName");
     if (!input) return;
 
-    const teamName = input.value.trim();
-    if (!teamName) {
-        alert("Enter team name");
-        return;
-    }
+    const name = input.value.trim();
+    if (!name) return alert("Enter team name");
 
     const res = await fetch("/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ teamName })
+        body: JSON.stringify({ teamName: name })
     });
 
     const data = await res.json();
 
     if (data.success) {
-        localStorage.setItem("teamName", teamName);
-        savedTeam = teamName;
+        localStorage.setItem("teamName", name);
+        savedTeam = name;
         updateLayout();
     }
 };
 
 
-// ================= BID =================
+// ================= PLACE BID =================
 window.bid = async function () {
 
-    if (!savedTeam) {
-        alert("Register first");
-        return;
-    }
+    if (!savedTeam) return alert("Register first");
 
     const amount = parseInt(document.getElementById("bidAmount").value);
 
@@ -54,21 +48,15 @@ window.bid = async function () {
 // ================= ADMIN FUNCTIONS =================
 window.saveSettings = async function () {
 
-    const base = document.getElementById("basePrice");
-    const cap = document.getElementById("capital");
-    const time = document.getElementById("roundTime");
-
     await fetch("/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            basePrice: parseInt(base?.value) || 0,
-            capital: parseInt(cap?.value) || 0,
-            roundTime: parseInt(time?.value) || 0
+            basePrice: parseInt(basePrice.value) || 0,
+            capital: parseInt(capital.value) || 0,
+            roundTime: parseInt(roundTime.value) || 0
         })
     });
-
-    alert("Settings Saved");
 };
 
 window.startRound = async function () {
@@ -77,6 +65,10 @@ window.startRound = async function () {
 
 window.endRound = async function () {
     await fetch("/end", { method: "POST" });
+};
+
+window.goDashboard = async function () {
+    await fetch("/activateDashboard", { method: "POST" });
 };
 
 
@@ -94,7 +86,6 @@ function updateLayout() {
     } else {
         if (registerCard) registerCard.style.display = "block";
         if (bidCard) bidCard.style.display = "none";
-        if (teamLabel) teamLabel.innerText = "";
     }
 }
 
@@ -105,99 +96,159 @@ async function loadData() {
     const res = await fetch("/data");
     const data = await res.json();
 
-    // Clear invalid session
-    if (savedTeam && !data.teams[savedTeam]) {
-        localStorage.removeItem("teamName");
-        savedTeam = null;
-        updateLayout();
-    }
-
-    // ===== ADMIN TIMER =====
+    // ================= TIMER =================
     const adminTimer = document.getElementById("timer");
-    if (adminTimer) {
+    if (adminTimer)
         adminTimer.innerText = "Time Left: " + data.timeLeft + "s";
-    }
 
-    // ===== TEAM TIMER =====
     const teamTimer = document.getElementById("teamTimer");
-    if (teamTimer) {
+    if (teamTimer)
         teamTimer.innerText = "Time Left: " + data.timeLeft + "s";
-    }
 
-    // ===== HIGHEST BIDDER =====
+
+    // ================= HIGHEST BIDDER =================
     const highest = document.getElementById("highestTeam");
-    if (highest) {
+    if (highest)
         highest.innerText =
             "Highest Bidder: " + (data.highestTeam || "None");
-    }
 
-    // ===== REGISTERED TEAMS TABLE =====
+
+    // ================= REGISTERED TEAMS TABLE =================
     const teamListTable = document.getElementById("teamListTable");
     if (teamListTable) {
 
         const tbody = teamListTable.querySelector("tbody");
         tbody.innerHTML = "";
 
-        let teamNo = 1;
-
-        for (let team in data.teams) {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${teamNo}</td>
-                    <td>${team}</td>
-                </tr>
-            `;
-            teamNo++;
+        let no = 1;
+        for (let t in data.teams) {
+            tbody.innerHTML += `<tr>
+                <td>${no}</td>
+                <td>${t}</td>
+            </tr>`;
+            no++;
         }
     }
 
-    // ===== ROUND RESULTS =====
+
+    // ================= ROUND RESULTS =================
     const adminHistoryTable = document.getElementById("adminHistoryTable");
     if (adminHistoryTable) {
 
         const tbody = adminHistoryTable.querySelector("tbody");
         tbody.innerHTML = "";
 
-        data.history.forEach((item, index) => {
+        data.history.forEach((h, i) => {
             tbody.innerHTML += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${item.team}</td>
-                    <td>₹${item.bid}</td>
-                </tr>
-            `;
+            <tr>
+                <td>${i + 1}</td>
+                <td>${h.team}</td>
+                <td>₹${h.bid}</td>
+            </tr>`;
         });
     }
 
-    // ===== TEAM INFO =====
+
+    // ================= ROUND DETAILS =================
+    const roundDetailsContainer =
+        document.getElementById("roundDetailsContainer");
+
+    if (roundDetailsContainer) {
+
+        roundDetailsContainer.innerHTML = "";
+
+        data.roundDetails.forEach(r => {
+
+            let html = `<div class="round-card">
+                <h3>Round ${r.round}</h3>
+                <table>
+                <thead>
+                <tr>
+                    <th>Team No</th>
+                    <th>Team Name</th>
+                    <th>Bid</th>
+                </tr>
+                </thead>
+                <tbody>`;
+
+            r.bids.forEach(b => {
+                html += `<tr>
+                    <td>${b.teamNo}</td>
+                    <td>${b.team}</td>
+                    <td>₹${b.bid}</td>
+                </tr>`;
+            });
+
+            html += `</tbody></table></div>`;
+            roundDetailsContainer.innerHTML += html;
+        });
+    }
+
+
+    // ================= TEAM INFO =================
     if (savedTeam && data.teams[savedTeam]) {
 
         const info = document.getElementById("teamInfo");
+
         if (info) {
             info.innerHTML = `
-                <div class="team-box">
-                    <p>Capital: ₹${data.teams[savedTeam].capital}</p>
-                    <p>Your Current Bid: ₹${data.teams[savedTeam].bid}</p>
-                </div>
-            `;
+            <div class="team-box">
+                <p>Capital: ₹${data.teams[savedTeam].capital}</p>
+                <p>Your Current Bid: ₹${data.teams[savedTeam].bid}</p>
+            </div>`;
         }
     }
 
-    // ===== TEAM WINNER TABLE =====
-    const winnerTable = document.getElementById("winnerTable");
-    if (winnerTable) {
 
-        const tbody = winnerTable.querySelector("tbody");
-        tbody.innerHTML = "";
+    // ================= ASSETS DASHBOARD =================
+    if (data.dashboardActive) {
 
-        data.history.forEach((item, index) => {
-            tbody.innerHTML += `
+        const auctionSection =
+            document.getElementById("auctionSection");
+        const assetsSection =
+            document.getElementById("assetsSection");
+
+        if (auctionSection) auctionSection.style.display = "none";
+        if (assetsSection) assetsSection.style.display = "block";
+
+        const assetsTable = document.getElementById("assetsTable");
+
+        if (assetsTable) {
+
+            const tbody = assetsTable.querySelector("tbody");
+            tbody.innerHTML = "";
+
+            let arr = [];
+            let no = 1;
+
+            for (let t in data.teams) {
+                let wins =
+                    data.history.filter(h => h.team === t).length;
+
+                arr.push({
+                    teamNo: no,
+                    name: t,
+                    assets: wins
+                });
+                no++;
+            }
+
+            arr.sort((a, b) => b.assets - a.assets);
+
+            arr.forEach((t, i) => {
+
+                let trophy =
+                    (i === 0 && t.assets > 0) ? " 🏆" : "";
+
+                tbody.innerHTML += `
                 <tr>
-                    <td>${index + 1}</td>
-                    <td>${item.team}</td>
-                </tr>
-            `;
-        });
+                    <td>${i + 1}</td>
+                    <td>${t.teamNo}</td>
+                    <td>${t.name}${trophy}</td>
+                    <td>${t.assets}</td>
+                </tr>`;
+            });
+        }
     }
 
     updateLayout();
