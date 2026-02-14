@@ -98,23 +98,37 @@ async function loadData() {
     const res = await fetch("/data");
     const data = await res.json();
 
-    // If saved team not found on server → clear it
+    // If saved team removed from server → clear session
     if (savedTeam && !data.teams[savedTeam]) {
         localStorage.removeItem("teamName");
         savedTeam = null;
         updateLayout();
     }
 
-    // ===== Highest Bidder + Timer =====
+    // ===== ADMIN TIMER =====
+    const adminTimer = document.getElementById("timer");
+    if (adminTimer) {
+        adminTimer.innerText = "Time Left: " + data.timeLeft + "s";
+    }
+
+    // ===== TEAM TIMER =====
+    const teamTimer = document.getElementById("teamTimer");
+    if (teamTimer) {
+        teamTimer.innerText = "Time Left: " + data.timeLeft + "s";
+
+        if (data.timeLeft <= 10) {
+            teamTimer.style.color = "red";
+        } else {
+            teamTimer.style.color = "#00e676";
+        }
+    }
+
+    // ===== HIGHEST BIDDER (ADMIN) =====
     const highest = document.getElementById("highestTeam");
-    if (highest)
+    if (highest) {
         highest.innerText =
             "Highest Bidder: " + (data.highestTeam || "None");
-
-    const timer = document.getElementById("timer");
-    if (timer)
-        timer.innerText =
-            "Time Left: " + data.timeLeft + "s";
+    }
 
     // ===== REGISTERED TEAMS TABLE =====
     const teamListTable = document.getElementById("teamListTable");
@@ -231,8 +245,9 @@ async function loadData() {
     updateLayout();
 }
 
-// AUTO REFRESH
+// AUTO REFRESH EVERY SECOND
 setInterval(loadData, 1000);
 
-// Initial layout
+// INITIAL LOAD
+loadData();
 updateLayout();
