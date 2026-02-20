@@ -21,10 +21,27 @@ body {
   margin-bottom: 20px;
 }
 
+/* Status Bar */
 .status-bar {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20px;
+  align-items: center;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-item h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #00ff66;
+}
+
+.icon {
+  font-size: 1.5rem;
 }
 
 /* Cards */
@@ -88,10 +105,49 @@ tr:hover {
   background-color: #2a2a2a;
 }
 
-/* Team Info Box */
-.team-box {
-  background: #222;
-  padding: 15px;
+/* Highlight Winner */
+#winnerTable tbody tr:first-child {
+  background-color: #003300;
+  color: #00ff66;
+  font-weight: bold;
+}
+
+/* Leaderboard Fade */
+.fade {
+  transition: opacity 0.5s ease-in-out;
+}
+.fade.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Toast Notification */
+.toast {
+  visibility: hidden;
+  min-width: 250px;
+  background-color: #00ff66;
+  color: #000;
+  text-align: center;
   border-radius: 6px;
-  margin-top: 10px;
+  padding: 12px;
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: bold;
+}
+
+.toast.show {
+  visibility: visible;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
 }
