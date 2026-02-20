@@ -5,13 +5,13 @@ body {
   font-family: 'Inter', sans-serif;
   margin: 0;
   padding: 0;
-  line-height: 1.6; /* Better readability */
+  line-height: 1.6;
 }
 
 .container {
   max-width: 900px;
   margin: auto;
-  padding: 40px; /* More breathing room */
+  padding: 40px;
 }
 
 /* Titles */
@@ -19,40 +19,46 @@ body {
   text-align: center;
   color: #00ff66;
   font-size: 2.5rem;
-  margin-bottom: 40px; /* Extra spacing below title */
+  margin-bottom: 40px;
 }
 
-/* Status Bar */
+/* Alignment Helpers */
+.center-text {
+  text-align: center;
+}
+.left-text {
+  text-align: left;
+}
+
+/* Status Bar (Timer + Base Price) */
 .status-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px; /* Space below status bar */
+  text-align: center;
+  margin-bottom: 30px;
 }
-
-.status-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.status-item h3 {
-  margin: 0;
-  font-size: 1.2rem;
+.status-bar h3 {
+  margin: 10px 0;
+  font-size: 1.4rem;
   color: #00ff66;
 }
 
-.icon {
+/* Team Name */
+.team-name-wrapper {
+  margin-bottom: 25px;
+}
+.team-name-wrapper h2 {
+  margin: 0;
   font-size: 1.5rem;
+  color: #00ff66;
 }
 
 /* Cards */
 .card {
   background: #1e1e1e;
   border-radius: 8px;
-  padding: 30px; /* More padding inside cards */
-  margin: 30px 0; /* More space between cards */
+  padding: 30px;
+  margin: 30px 0;
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  animation: fadein 0.6s ease; /* Smooth entry */
 }
 
 .card h2 {
@@ -60,11 +66,25 @@ body {
   margin-bottom: 20px;
 }
 
+/* Bid Card (compact, centered) */
+.bid-card {
+  text-align: center;
+}
+.bid-card input {
+  width: 200px;
+  margin: 10px auto;
+  display: block;
+}
+.bid-card button {
+  display: block;
+  margin: 10px auto;
+}
+
 /* Inputs & Buttons */
 input {
   width: 100%;
   padding: 12px;
-  margin: 20px 0; /* More spacing around inputs */
+  margin: 20px 0;
   border-radius: 6px;
   border: 1px solid #333;
   background: #222;
@@ -84,6 +104,7 @@ button {
 
 button:hover {
   background-color: #00cc55;
+  transform: scale(1.05); /* Subtle hover zoom */
 }
 
 /* Tables */
@@ -106,6 +127,7 @@ th {
 
 tr:hover {
   background-color: #2a2a2a;
+  transition: background-color 0.3s ease;
 }
 
 /* Highlight Winner */
@@ -115,6 +137,15 @@ tr:hover {
   font-weight: bold;
 }
 
+/* Team Info Box */
+.team-box {
+  background: #222;
+  padding: 20px;
+  border-radius: 6px;
+  margin-top: 15px;
+  animation: fadein 0.6s ease;
+}
+
 /* Leaderboard Fade */
 .fade {
   transition: opacity 0.5s ease-in-out;
@@ -122,14 +153,6 @@ tr:hover {
 .fade.hidden {
   opacity: 0;
   pointer-events: none;
-}
-
-/* Team Info Box */
-.team-box {
-  background: #222;
-  padding: 20px;
-  border-radius: 6px;
-  margin-top: 15px;
 }
 
 /* Toast Notification */
@@ -146,6 +169,7 @@ tr:hover {
   left: 50%;
   transform: translateX(-50%);
   font-weight: bold;
+  z-index: 999;
 }
 
 .toast.show {
@@ -153,12 +177,13 @@ tr:hover {
   animation: fadein 0.5s, fadeout 0.5s 2.5s;
 }
 
+/* Keyframes */
 @keyframes fadein {
-  from {bottom: 0; opacity: 0;}
-  to {bottom: 30px; opacity: 1;}
+  from {opacity: 0; transform: translateY(10px);}
+  to {opacity: 1; transform: translateY(0);}
 }
 
 @keyframes fadeout {
-  from {bottom: 30px; opacity: 1;}
-  to {bottom: 0; opacity: 0;}
+  from {opacity: 1; transform: translateY(0);}
+  to {opacity: 0; transform: translateY(10px);}
 }
