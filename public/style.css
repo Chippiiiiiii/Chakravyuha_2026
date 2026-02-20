@@ -1,7 +1,7 @@
 /* General Layout */
 body {
-  background-color: #121212; /* keep your dark theme */
-  color: #e0e0e0;            /* keep your light text */
+  background-color: #121212; /* keep dark theme */
+  color: #e0e0e0;            /* keep light text */
   font-family: 'Inter', sans-serif;
   margin: 0;
   padding: 0;
@@ -17,15 +17,28 @@ body {
 /* Title */
 .main-title {
   text-align: center;
-  color: #00ff66; /* keep your green accent */
+  color: #00ff66; /* keep green accent */
   font-size: 2.5rem;
   margin-bottom: 40px;
+}
+
+/* Card Style */
+.card {
+  background: #1e1e1e;
+  border-radius: 8px;
+  padding: 30px;
+  margin: 30px 0; /* spacing between cards */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* card effect */
+}
+
+.card h2 {
+  color: #00ff66;
+  margin-bottom: 20px;
 }
 
 /* Status Bar (Timer + Base Price centered at top) */
 .status-bar {
   text-align: center;
-  margin-bottom: 30px;
 }
 .status-bar h3 {
   margin: 10px 0;
@@ -35,27 +48,12 @@ body {
 
 /* Team Name (left aligned, below status bar) */
 .team-name-wrapper {
-  margin-bottom: 25px;
   text-align: left;
 }
 .team-name-wrapper h2 {
   margin: 0;
   font-size: 1.5rem;
   color: #00ff66;
-}
-
-/* Cards */
-.card {
-  background: #1e1e1e;
-  border-radius: 8px;
-  padding: 30px;
-  margin: 30px 0;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-}
-
-.card h2 {
-  color: #00ff66;
-  margin-bottom: 20px;
 }
 
 /* Bid Card (compact, centered) */
