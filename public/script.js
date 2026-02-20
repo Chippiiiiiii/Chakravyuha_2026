@@ -1,3 +1,108 @@
+// -------------------- SERVER SIDE --------------------
+
+const express = require("express");
+const app = express();
+const http = require("http").createServer(app);
+const io = require("socket.io")(http);
+
+app.use(express.json());
+
+let settings = {
+    capital: 0,
+    roundTime: 0,
+    basePrice: 0
+};
+
+let teams = {};
+let history = [];
+let leaderboard = [];
+let showLeaderboard = false;
+
+function collectGameState() {
+    return {
+        timeLeft: settings.roundTime,
+        basePrice: settings.basePrice,
+        highestTeam: null,
+        teams,
+        history,
+        leaderboard,
+        showLeaderboard
+    };
+}
+
+// Admin saves settings
+app.post("/settings", (req, res) => {
+    const { capital, roundTime, basePrice } = req.body;
+    settings.capital = capital;
+    settings.roundTime = roundTime;
+    settings.basePrice = basePrice;
+
+    io.emit("update", collectGameState());
+    res.json({ success: true });
+});
+
+// Team registers
+app.post("/register", (req, res) => {
+    const { teamName } = req.body;
+
+    if (!teamName) {
+        return res.json({ error: "Team name required" });
+    }
+
+    if (!teams[teamName]) {
+        teams[teamName] = {
+            capital: settings.capital, // use Admin’s saved capital
+            bid: 0
+        };
+    }
+
+    io.emit("update", collectGameState());
+
+    res.json({ success: true, capital: teams[teamName].capital });
+});
+
+// Team places bid
+app.post("/bid", (req, res) => {
+    const { teamName, amount } = req.body;
+
+    if (!teams[teamName]) {
+        return res.json({ error: "Team not registered" });
+    }
+
+    if (amount <= 0) {
+        return res.json({ error: "Invalid bid amount" });
+    }
+
+    teams[teamName].bid = amount;
+
+    io.emit("update", collectGameState());
+    res.json({ success: true });
+});
+
+// Example round control
+app.post("/start", (req, res) => {
+    // start round logic...
+    io.emit("update", collectGameState());
+    res.json({ success: true });
+});
+
+app.post("/end", (req, res) => {
+    // end round logic...
+    io.emit("update", collectGameState());
+    res.json({ success: true });
+});
+
+app.post("/toggleLeaderboard", (req, res) => {
+    showLeaderboard = !showLeaderboard;
+    io.emit("update", collectGameState());
+    res.json({ success: true });
+});
+
+http.listen(3000, () => console.log("Server running on port 3000"));
+
+
+// -------------------- CLIENT SIDE (Teams script.js) --------------------
+
 let savedTeam = localStorage.getItem("teamName") || null;
 const socket = io();
 
@@ -24,7 +129,7 @@ window.register = async function () {
         if (info) {
             info.innerHTML = `
                 <div class="team-box">
-                    <p>Capital: ₹${data.capital || 0}</p>
+                    <p>Capital: ₹${data.capital}</p>
                     <p>Your Current Bid: ₹0</p>
                 </div>`;
         }
@@ -95,91 +200,12 @@ function updateLayout() {
 
 socket.on("update", (data) => {
     // Timers
-    const timer = document.getElementById("timer");
-    if (timer) timer.innerText = "Time Left: " + data.timeLeft + "s";
-
     const teamTimer = document.getElementById("teamTimer");
     if (teamTimer) teamTimer.innerText = "Time Left: " + data.timeLeft + "s";
 
     // Base Price Display
     const basePriceDisplay = document.getElementById("basePriceDisplay");
     if (basePriceDisplay) basePriceDisplay.innerText = "Base Price: ₹" + data.basePrice;
-
-    // Highest Bidder (Admin)
-    const highest = document.getElementById("highestTeam");
-    if (highest)
-        highest.innerText = "Highest Bidder: " + (data.highestTeam || "None");
-
-    // Registered Teams (Admin)
-    const teamListTable = document.getElementById("teamListTable");
-    if (teamListTable) {
-        const tbody = teamListTable.querySelector("tbody");
-        tbody.innerHTML = "";
-        let no = 1;
-        for (let t in data.teams) {
-            tbody.innerHTML += `<tr><td>${no}</td><td>${t}</td></tr>`;
-            no++;
-        }
-    }
-
-    // Round Results (Admin)
-    const adminHistoryTable = document.getElementById("adminHistoryTable");
-    if (adminHistoryTable) {
-        const tbody = adminHistoryTable.querySelector("tbody");
-        tbody.innerHTML = "";
-        data.history.forEach((h, i) => {
-            tbody.innerHTML += `
-            <tr>
-                <td>${i + 1}</td>
-                <td>${h.team || "No Winner"}</td>
-                <td>₹${h.bid}</td>
-            </tr>`;
-        });
-    }
-
-    // Round Bids (Admin)
-    const roundBidsContainer = document.getElementById("roundBidsContainer");
-    if (roundBidsContainer) {
-        roundBidsContainer.innerHTML = "";
-        data.history.forEach((h) => {
-            let tableHTML = `
-            <h3>Round ${h.round}</h3>
-            <table>
-                <thead>
-                    <tr><th>Team No</th><th>Team Name</th><th>Bid</th></tr>
-                </thead>
-                <tbody>`;
-            h.allBids.forEach(b => {
-                tableHTML += `<tr><td>${b.teamNo}</td><td>${b.team}</td><td>₹${b.bid}</td></tr>`;
-            });
-            tableHTML += "</tbody></table>";
-            roundBidsContainer.innerHTML += tableHTML;
-        });
-    }
-
-    // Leaderboard
-    const leaderboardContainer = document.getElementById("leaderboardContainer");
-    if (leaderboardContainer) {
-        if (data.showLeaderboard) {
-            leaderboardContainer.style.display = "block";
-            leaderboardContainer.innerHTML = `
-            <table>
-                <thead>
-                    <tr><th>Team No</th><th>Team Name</th><th>Rounds Won</th></tr>
-                </thead>
-                <tbody>
-                    ${data.leaderboard.map(l => `
-                        <tr>
-                            <td>${l.teamNo}</td>
-                            <td>${l.team}</td>
-                            <td>${l.wins}</td>
-                        </tr>`).join("")}
-                </tbody>
-            </table>`;
-        } else {
-            leaderboardContainer.style.display = "none";
-        }
-    }
 
     // Team Info (Teams Page)
     if (savedTeam && data.teams[savedTeam]) {
@@ -205,6 +231,30 @@ socket.on("update", (data) => {
                 <td>${item.team || "No Winner"}</td>
             </tr>`;
         });
+    }
+
+    // Leaderboard
+    const leaderboardContainer = document.getElementById("leaderboardContainer");
+    if (leaderboardContainer) {
+        if (data.showLeaderboard) {
+            leaderboardContainer.style.display = "block";
+            leaderboardContainer.innerHTML = `
+            <table>
+                <thead>
+                    <tr><th>Team No</th><th>Team Name</th><th>Rounds Won</th></tr>
+                </thead>
+                <tbody>
+                    ${data.leaderboard.map(l => `
+                        <tr>
+                            <td>${l.teamNo}</td>
+                            <td>${l.team}</td>
+                            <td>${l.wins}</td>
+                        </tr>`).join("")}
+                </tbody>
+            </table>`;
+        } else {
+            leaderboardContainer.style.display = "none";
+        }
     }
 
     updateLayout();
