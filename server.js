@@ -16,6 +16,7 @@ let currentRoundBids = {};
 let roundNumber = 1;
 let timerRunning = false;
 let timeLeft = 60;
+let showLeaderboard = false; // NEW FLAG
 
 // Admin settings
 let initialCapital = 0;
@@ -70,6 +71,13 @@ app.post("/end", (req, res) => {
     res.json({ success: true });
 });
 
+// Toggle leaderboard (Admin control)
+app.post("/toggleLeaderboard", (req, res) => {
+    showLeaderboard = !showLeaderboard;
+    io.emit("update", getData());
+    res.json({ success: true, showLeaderboard });
+});
+
 // Round end logic
 function endRoundLogic() {
     timerRunning = false;
@@ -102,7 +110,7 @@ function endRoundLogic() {
     io.emit("update", getData());
 }
 
-// Helper: calculate leaderboard
+// Leaderboard calculation
 function calculateLeaderboard() {
     let leaderboard = {};
     history.forEach(h => {
@@ -118,7 +126,7 @@ function calculateLeaderboard() {
     }));
 }
 
-// Helper: current state
+// Current state
 function getData() {
     return {
         teams,
@@ -131,7 +139,8 @@ function getData() {
             ? Object.entries(currentRoundBids).sort((a,b)=>b[1]-a[1])[0][0]
             : null,
         basePrice,
-        leaderboard: calculateLeaderboard()
+        leaderboard: calculateLeaderboard(),
+        showLeaderboard
     };
 }
 
