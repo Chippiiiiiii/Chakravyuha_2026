@@ -9,29 +9,42 @@
 <div class="container">
 
     <h1 class="main-title">AUCTION</h1>
-    <div class="status-bar">
-        <h3 id="teamTimer"></h3>
-        <h3 id="basePriceDisplay"></h3>
+
+    <!-- Status Bar -->
+    <div class="status-bar card">
+        <div class="status-item">
+            <span class="icon">⏱</span>
+            <h3 id="teamTimer">Time Left: 0s</h3>
+        </div>
+        <div class="status-item">
+            <span class="icon">💰</span>
+            <h3 id="basePriceDisplay">Base Price: ₹0</h3>
+        </div>
     </div>
 
-    <div class="team-name-wrapper">
-        <h3 id="teamLabel"></h3>
+    <!-- Team Name -->
+    <div class="team-name-wrapper card">
+        <h2 id="teamLabel">Team name: </h2>
     </div>
 
+    <!-- Registration -->
     <div class="card" id="registerCard">
         <h2>Register Team</h2>
         <input type="text" id="teamName" placeholder="Enter Team Name">
         <button onclick="register()">Register</button>
     </div>
 
+    <!-- Bidding -->
     <div class="card" id="bidCard" style="display:none;">
         <h2>Place Your Bid</h2>
         <input type="number" id="bidAmount" placeholder="Enter Bid">
         <button onclick="bid()">Place Bid</button>
     </div>
 
+    <!-- Team Info -->
     <div id="teamInfo" class="card"></div>
 
+    <!-- Round Winners -->
     <div class="card">
         <h2>Round Winners</h2>
         <table id="winnerTable">
@@ -42,12 +55,16 @@
         </table>
     </div>
 
-    <div class="card">
+    <!-- Leaderboard -->
+    <div class="card leaderboard-card">
         <h2>Leaderboard</h2>
-        <div id="leaderboardContainer"></div>
+        <div id="leaderboardContainer" class="fade"></div>
     </div>
 
 </div>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast"></div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="script.js"></script>
