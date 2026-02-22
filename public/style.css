@@ -11,15 +11,15 @@ body {
 .container {
   max-width: 900px;
   margin: auto;
-  padding: 40px;
+  padding: 40px 0 60px 0;
 }
 
 /* Title */
 .main-title {
   text-align: center;
-  color: #00ff66;
+  color: #00e676;
   font-size: 2.5rem;
-  margin-bottom: 40px;
+  margin-bottom: 25px;
 }
 
 /* -------------------- ADMIN DEFAULT STYLES -------------------- */
@@ -37,13 +37,13 @@ body {
 }
 
 input {
-  width: 100%;
+  width: 92%;
   padding: 12px;
-  margin: 20px 0;
-  border-radius: 6px;
-  border: 1px solid #333;
-  background: #222;
-  color: #e0e0e0;
+  margin-bottom: 15px ;
+  border-radius: 8px;
+  border: none ;
+  background: #2a2a2a;
+  color: white ;
 }
 
 button {
@@ -66,9 +66,10 @@ button:hover {
 .team-bid-card,
 .team-register-card,
 .team-info-card {
-  text-align: center;
-  max-width: 300px;
-  margin: 0 auto 20px auto;
+  
+  border-collapse: collapse;
+  max-width: 100px;
+  margin-top: 20px ;
   padding: 15px;
 }
 
@@ -161,3 +162,4 @@ tr:hover {
   border-radius: 6px;
   margin-top: 15px;
 }
+
