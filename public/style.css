@@ -1,165 +1,69 @@
-/* General Layout */
 body {
-  background-color: #121212;
-  color: #e0e0e0;
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-  padding: 0;
-  line-height: 1.6;
+  background: #111;
+  color: #00ff66;
+  font-family: Arial, sans-serif;
 }
 
 .container {
-  max-width: 900px;
+  max-width: 800px;
   margin: auto;
-  padding: 40px 0 60px 0;
+  padding: 20px;
 }
 
-/* Title */
 .main-title {
   text-align: center;
-  color: #00e676;
-  font-size: 2.5rem;
-  margin-bottom: 25px;
+  color: white; /* Title in white */
 }
 
-/* -------------------- ADMIN DEFAULT STYLES -------------------- */
-.card {
-  background: #1e1e1e;
-  border-radius: 8px;
-  padding: 30px;
-  margin: 30px 0;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-}
-
-.card h2 {
-  color: #00ff66;
-  margin-bottom: 20px;
-}
-
-input {
-  width: 92%;
-  padding: 12px;
-  margin-bottom: 15px ;
-  border-radius: 8px;
-  border: none ;
-  background: #2a2a2a;
-  color: white ;
-}
-
-button {
-  background-color: #00ff66;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 6px;
-  color: #000;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-button:hover {
-  background-color: #00cc55;
-  transform: scale(1.05);
-}
-
-/* -------------------- TEAMS COMPACT STYLES -------------------- */
-.team-bid-card,
-.team-register-card,
-.team-info-card {
-  
-  border-collapse: collapse;
-  max-width: 100px;
-  margin-top: 20px ;
-  padding: 15px;
-}
-
-.team-bid-card h2,
-.team-register-card h2,
-.team-info-card h2 {
-  font-size: 1.2rem;
-  margin-bottom: 10px;
-}
-
-.team-bid-card input,
-.team-register-card input {
-  width: 150px;
-  padding: 6px;
-  margin: 8px auto;
-  display: block;
-}
-
-.team-bid-card button,
-.team-register-card button {
-  padding: 6px 14px;
-  font-size: 0.85rem;
-  margin: 8px auto;
-}
-
-.team-info-card p {
-  font-size: 0.9rem;
-  margin: 6px 0;
-}
-
-/* -------------------- STATUS BAR -------------------- */
 .status-bar {
   display: flex;
-  justify-content: center;
-  gap: 40px;
-  margin-bottom: 30px;
+  justify-content: space-around;
+  margin: 20px 0;
 }
 
-.status-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.status-bar h3 {
+  color: white; /* Timer + Base Price titles in white */
 }
 
-.status-item h3 {
-  margin: 0;
-  font-size: 1.2rem;
-  color: #00ff66;
-}
-
-.icon {
-  font-size: 1.4rem;
-  color: #00ff66;
-}
-
-/* -------------------- TABLES -------------------- */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-
-th, td {
-  padding: 14px;
-  border-bottom: 1px solid #333;
-}
-
-th {
-  background-color: #222;
-  color: #00ff66;
-}
-
-tr:hover {
-  background-color: #2a2a2a;
-  transition: background-color 0.3s ease;
-}
-
-/* Highlight Winner */
-#winnerTable tbody tr:first-child {
-  background-color: #003300;
-  color: #00ff66;
-  font-weight: bold;
-}
-
-/* Team Info Box */
-.team-box {
+.card {
   background: #222;
   padding: 20px;
-  border-radius: 6px;
-  margin-top: 15px;
+  margin: 15px auto;
+  border-radius: 8px;
+  width: 300px; /* consistent card size */
+  text-align: center;
 }
 
+.card input {
+  width: 90%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 4px;
+}
+
+.card button {
+  background: #00ff66;
+  color: #111;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.card button:hover {
+  background: #00cc55;
+}
+
+.team-box {
+  background: #222;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+  color: white; /* Capital + Bid text in white */
+}
+
+.winner-section h2,
+.card h2 {
+  color: white; /* Section titles in white */
+}
