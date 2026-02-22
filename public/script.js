@@ -51,32 +51,6 @@ window.bid = async function () {
     }
 };
 
-// -------------------- ADMIN FUNCTIONS --------------------
-
-window.saveSettings = async function () {
-    await fetch("/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            capital: parseInt(document.getElementById("capital").value) || 0,
-            roundTime: parseInt(document.getElementById("roundTime").value) || 0,
-            basePrice: parseInt(document.getElementById("basePrice").value) || 0
-        })
-    });
-};
-
-window.startRound = async function () {
-    await fetch("/start", { method: "POST" });
-};
-
-window.endRound = async function () {
-    await fetch("/end", { method: "POST" });
-};
-
-window.toggleLeaderboard = async function () {
-    await fetch("/toggleLeaderboard", { method: "POST" });
-};
-
 // -------------------- LAYOUT CONTROL --------------------
 
 function updateLayout() {
