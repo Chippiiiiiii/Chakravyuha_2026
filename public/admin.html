@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Dashboard - Auction</title>
+    <title>AUCTION ADMIN</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -9,40 +9,52 @@
 <div class="container">
 
     <h1 class="main-title">AUCTION ADMIN</h1>
-    <h3 id="timer" style="text-align:center;"></h3>
-    <h3 id="highestTeam" style="text-align:center;"></h3>
 
-    <div class="card admin-card">
-        <input type="number" id="capital" placeholder="Initial Capital" value="100">
-        <input type="number" id="roundTime" placeholder="Round Time (seconds)" value="60">
-        <input type="number" id="basePrice" placeholder="Base Price" value="0">
+    <!-- Settings -->
+    <div class="card">
+        <input type="number" id="capital" placeholder="Enter Capital" value="100">
+        <input type="number" id="roundTime" placeholder="Enter Round Time (s)" value="60">
+        <input type="number" id="basePrice" placeholder="Enter Base Price" value="0">
+
         <button onclick="saveSettings()">Save Settings</button>
         <button onclick="startRound()">Start Round</button>
         <button onclick="endRound()">End Round</button>
         <button onclick="toggleLeaderboard()">Leaderboard</button>
     </div>
 
-    <h2>Registered Teams</h2>
-    <table id="teamListTable">
-        <thead>
-            <tr><th>S.No</th><th>Team Name</th></tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <!-- Registered Teams -->
+    <div class="card">
+        <h2>Registered Teams</h2>
+        <table id="teamListTable">
+            <thead>
+                <tr><th>S.No</th><th>Team Name</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 
-    <h2>Round Results</h2>
-    <table id="adminHistoryTable">
-        <thead>
-            <tr><th>S.No</th><th>Team</th><th>Winning Bid</th></tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <!-- Round Results -->
+    <div class="card">
+        <h2>Round Results</h2>
+        <table id="adminHistoryTable">
+            <thead>
+                <tr><th>S.No</th><th>Team</th><th>Winning Bid</th></tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 
-    <h2>Round Bids</h2>
-    <div id="roundBidsContainer"></div>
+    <!-- Round Bids -->
+    <div class="card">
+        <h2>Round Bids</h2>
+        <div id="roundBidsContainer"></div>
+    </div>
 
-    <h2>Leaderboard</h2>
-    <div id="leaderboardContainer" style="display:none;"></div>
+    <!-- Leaderboard -->
+    <div class="card">
+        <h2>Leaderboard</h2>
+        <div id="leaderboardContainer"></div>
+    </div>
 
 </div>
 
